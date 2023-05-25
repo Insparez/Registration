@@ -17,6 +17,7 @@ void writeToFile(string, string, bool firstAcc = true); // запись поле
 bool parceFile(map<string, string>& accounts); // парсинг файла в мапу
 bool isLegalName(string);// проверка лежгитности никнейма
 bool isLegalPass(string);// проверка легитности пароля
+string generatePass(); // генерирует легитный пароль
 string encrypt(string& toEncrypt); // шИфровка данных
 string decrypt(string& toDecrypt);// расшифровка данных
 
@@ -87,17 +88,29 @@ bool startMenu() {
 	}
 }
 void inputFields(string& nick, string& pass, bool isAcc) {
+	if (!isAcc) // Если нет аккаунта то вводим легальные значения
+	{
 	cout << "Enter your nickname: ";
 	getline(cin >> ws, nick);
-	if (!isAcc)
-	{
 		while (!isLegalName(nick)) {
 			cout << "Enter your nickname: ";
 			getline(cin >> ws, nick);// ws нужен для того чтобы избавиться от пробелных символов после cin в startmenu()
 		}
+		cout << "Enter your password: ";
+		getline(cin >> ws, pass);
+		while (!isLegalPass(pass))
+		{
+			cout << "Enter your password: ";
+			getline(cin >> ws, pass);
+		}
 	}
+	else { // если аккаунт есть то без разницы что вводить т.к проверятется только наличие имени
+		cout << "Enter your nickname: ";
+		getline(cin >> ws, nick);
 	cout << "Enter your password: ";
 	getline(cin >> ws, pass);
+	}
+
 }
 void writeToFile(string nickName, string passWord, bool firstAcc) {
 	ofstream fout;
@@ -143,32 +156,29 @@ bool parceFile(map<string, string>& accounts) {
 		}
 		catch (const std::exception&)
 		{
+			for (auto i : accounts)
+			{
+				cout << "parced acc: " << i.first << "  " << i.second << endl;
+			}
 			return true;
 		}
+
 		if (input.empty())
 		{
 			haveName = false;
 			continue;
 		}
 		else {
-			if (haveName) {
-				inputPass = input;
-			}
-			else {
-				if (input == "-----------------------------")
-				{
-					nodeStart = true;
-					continue;
-				}
-				inputName = input;
-				haveName = true;
-
-			}
+			
 		}
-		if (!inputName.empty() && !inputPass.empty() && howData == 2)
+		if (!inputName.empty() && !inputPass.empty() && howData == 2 && input == "-----------------------------")
 		{
 			accounts.insert(make_pair(inputName, inputPass));
 			howData = 0;
+			haveName = false;
+		}
+		else {
+			
 		}
 	}
 	fin.close();
@@ -218,25 +228,60 @@ bool isLegalName(string nickName) {
 		return true;
 	}
 }
-bool isLegalPass(string passWord) {
-	if (passWord.size() < 8)
+bool isLegalPass(string pass) {
+	bool lower = false;
+	bool upper = false;
+	bool digit = false;
+	bool punct = false;
+	if (pass.size() < 8 || pass.size() > 20)
 	{
 		return false;
 	}
-	for (int i = 0; i < passWord.size(); i++)
+	for (int i = 0; i < pass.size(); i++)
 	{
-
+		if (islower(pass[i]) && !lower) {
+			lower = true;
+		}
+		else if (isupper(pass[i]) && !upper) {
+			upper = true;
+		}
+		else if (isdigit(pass[i]) && !digit) {
+			digit = true;
+		}
+		else if (ispunct(pass[i]) && !punct) {
+			punct = true;
+		} if (lower && upper && digit && punct)
+		{
+			return true;
+		}
 	}
+	return false;
+}
+string generatePass() {
+	string passWord;
+	while (!isLegalPass(passWord))
+	{
+		passWord = "";
+		int sizePass = 8 + rand() % 12;
+		for (int i = 0; i < sizePass; i++)
+		{
+			char symbol = 33 + rand() % 93;
+			passWord.push_back(symbol);
+		}
+	}
+	return passWord;
 }
 string encrypt(string& toEncrypt) {
 	string output;
 	int key2 = 33 + rand() % 89;
+	int key3= 33 + rand() % 67;
 	for (int i = 0; i < toEncrypt.size(); i++)
 	{
 		int key1 = 1 + rand() % 4;
 		output.push_back(toEncrypt[i] + key1);
-		output.push_back(char(key1 + key2));
+		output.push_back(char(key1 + key2+key3));
 	}
+	output.push_back(char(key3));
 	output.push_back(char(key2));
 	return output;
 }
@@ -244,9 +289,10 @@ string decrypt(string& toDecrypt) {
 	string output;
 	vector<int> keys;
 	int key1 = int(toDecrypt[toDecrypt.size() - 1]);
+	int key2 = int(toDecrypt[toDecrypt.size() - 2]);
 	for (int i = 1; i < toDecrypt.size() - 1; i = i + 2)
 	{
-		output.push_back(toDecrypt[i - 1] - (toDecrypt[i] - key1));
+		output.push_back(toDecrypt[i - 1] - (toDecrypt[i] - key1-key2));
 	}
 	return output;
 }
