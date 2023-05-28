@@ -8,18 +8,19 @@
 #include <limits>
 #include <vector>
 #include <map>
+#include <iterator>
 
 using namespace std;
 
-bool startMenu(); // checking availability account
-void inputFields(string&, string&, bool isAcc = false); // поля для ввоода данных
+bool startMenu(); // создать аккаунт или залогиниться
+void inputFields(string&, string&, bool isAcc = false); // поля для ввода данных
 void writeToFile(string, string, bool firstAcc = true); // запись полей в файл
-bool parceFile(map<string, string>& accounts); // парсинг файла в мапу
-bool isLegalName(string);// проверка лежгитности никнейма
+bool parceFile(map<string, string>& accounts); // парсинг файла в контейнер
+bool isLegalName(string);// проверка легитности никнейма
 bool isLegalPass(string);// проверка легитности пароля
 string generatePass(); // генерирует легитный пароль
-string encrypt(string& toEncrypt); // шИфровка данных
-string decrypt(string& toDecrypt);// расшифровка данных
+string encrypt(string& toEncrypt); // шифровка пароля в файл
+string decrypt(string& toDecrypt);// расшифровка пароля из файла
 
 int main()
 {
@@ -44,7 +45,7 @@ int main()
 		{
 			inputFields(nickName, passWord, true);
 			auto it = accounts.find(nickName);
-			if (it != accounts.end() && it->second == decrypt(passWord))
+			if (it != accounts.end() && passWord == decrypt(it->second))
 			{
 				cout << "Succsesfully!";
 				isWrong = false;
@@ -121,7 +122,7 @@ void writeToFile(string nickName, string passWord, bool firstAcc) {
 			fout << "-----------------------------" << "\n" << nickName << "\n" << passWord << "\n" << "-----------------------------" << endl;
 		}
 		else {
-			fout << "\n" << nickName << "\n" << passWord << "\n" << "-----------------------------" << endl;
+			fout << nickName << "\n" << passWord << "\n" << "-----------------------------" << endl;
 		}
 		cout << "Account succsesfully created!" << endl;
 	}
@@ -142,43 +143,35 @@ bool parceFile(map<string, string>& accounts) {
 		cerr << "Error of openning the file, " << ex.what();
 		exit(0);
 	}
-	string inputName = "", inputPass = "";
 	string input = "";
-	bool haveName = false;
-	bool nodeStart = false;
-	bool nodeEnd = false;
-	int howData = 0;
+	vector<string> acc;
 	while (fin.good())
 	{
-		try
-		{
-			getline(fin, input);
-		}
-		catch (const std::exception&)
-		{
-			for (auto i : accounts)
+		    input = "";
+			try
 			{
-				cout << "parced acc: " << i.first << "  " << i.second << endl;
+			getline(fin, input);
 			}
-			return true;
-		}
-
-		if (input.empty())
+			catch (const std::exception&)
+			{
+				break;
+			}
+			if (fin.eof())
+			{
+				break;
+			}
+			acc.push_back(input);
+	}
+	acc.push_back(input);
+	for (auto i = acc.begin(), j= acc.begin(); i < acc.end(); i++)
+	{
+		if (distance(i, acc.end()) >= 4 && *i == "-----------------------------" && !(i + 1)->empty() && *(i + 1) != "-----------------------------" && !(i + 2)->empty() && *(i + 2) != "-----------------------------" && *(i + 3) == "-----------------------------")
 		{
-			haveName = false;
+			j = i+2;
+			accounts.insert(make_pair(*(i+1), *(j)));
+			i += 2;
+		}else{
 			continue;
-		}
-		else {
-			
-		}
-		if (!inputName.empty() && !inputPass.empty() && howData == 2 && input == "-----------------------------")
-		{
-			accounts.insert(make_pair(inputName, inputPass));
-			howData = 0;
-			haveName = false;
-		}
-		else {
-			
 		}
 	}
 	fin.close();
@@ -235,6 +228,7 @@ bool isLegalPass(string pass) {
 	bool punct = false;
 	if (pass.size() < 8 || pass.size() > 20)
 	{
+		cout << "Password have to contain more 8 and less 20 symbols.!"<< endl;
 		return false;
 	}
 	for (int i = 0; i < pass.size(); i++)
@@ -255,6 +249,7 @@ bool isLegalPass(string pass) {
 			return true;
 		}
 	}
+	cout << "Password have to contain at least one digit, lowercase and uppercase letters, and special symbol!" << endl;
 	return false;
 }
 string generatePass() {
@@ -273,8 +268,8 @@ string generatePass() {
 }
 string encrypt(string& toEncrypt) {
 	string output;
-	int key2 = 33 + rand() % 89;
-	int key3= 33 + rand() % 67;
+	int key2 = 33 + rand() % 40;
+	int key3= 33 + rand() % 40;
 	for (int i = 0; i < toEncrypt.size(); i++)
 	{
 		int key1 = 1 + rand() % 4;
