@@ -1,4 +1,3 @@
-#pragma once
 // Registration app
 // Developed by inspare
 #pragma once
@@ -12,13 +11,16 @@
 #include <map>
 #include <iterator>
 #include <conio.h>
+#include "windows.h"
+#include <thread>
+#include <mutex>
+#include <stdlib.h>
 
 using namespace std;
-
 extern map<string, string> accounts; // использование глобального бинарного дерева
-bool startMenu(); // создать аккаунт или залогиниться
+void showRules(); // показать правила создания логина и пароля
 void inputFields(string&, string&, bool isAcc = false); // поля для ввода данных
-void writeToFile(string, string, bool firstAcc = true); // запись полей в файл
+void writeToFile(string, string, bool& firstAcc); // запись полей в файл
 bool parceFile(map<string, string>& accounts); // парсинг файла в бинарное дерево
 bool isLegalName(string);// проверка легитности никнейма
 string inputPass();// Пароль со звездочками
@@ -29,3 +31,7 @@ string decrypt(string& toDecrypt);// расшифровка пароля из файла
 void accMenu(map<string, string>::iterator it);// предоставляет действия в залогиненном аккаунте
 void removeAcc(map<string, string>::iterator it); // Удаление аккаунта
 void overWritingToFile();// Перезапись аккаунтов с учетом поврежденных данных или при удалении аккаунта
+void sleepper(string);//Плавно выводит информацию
+void updator();// обновляет строку, а не всю консоль
+bool whatToDo();// сздать аккаунт , залогиниться или выйти из приложения
+//void changeName(map<string, string>::iterator index); // изменение имени

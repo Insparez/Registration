@@ -1,49 +1,35 @@
+// Registration app
+// Developed by inspare
 #include "Account.h"
 
-bool startMenu() {
-	cout << "Welcome to the start page." << endl;
+void showRules() {
 	cout << "------------------------------------------------------------------------------------------------------------" << endl;
-	cout << "Nickname have to contain from 4 to 15 symbols!" << endl;
-	cout << "Nickname can contains only a-z, A-Z, 0-9 and _ in the middle" << endl;
-	cout << "Name cant start with digit" << endl;
-	cout << "Nick doesnt contain only digits." << endl;
+	sleepper("Rules for creating a nickname:");
+	sleepper("-Nickname have to contain from 4 to 15 symbols;");
+	sleepper("-Nickname can contains only a-z, A-Z, 0-9 and _ in the middle;");
+	sleepper("-Name cant start with digit;");
+	sleepper("-Nick doesnt contain only digits.");
 	cout << "------------------------------------------------------------------------------------------------------------" << endl;
-	cout << "Password have to contain more 8 and less 20 symbols.!" << endl;
-	cout << "Password have to contain at least one digit, lowercase and uppercase letters, and special symbol!" << endl;
-	cout << "You can generate legit password, use letter 'g' in the password field." << endl;
+	sleepper("Rules for creating a password: ");
+	sleepper("-Password have to contain more 8 and less 20 symbols;");
+	sleepper("-Password have to contain at least one digit, lowercase and uppercase letters, and special symbol;");
+	sleepper("-You can generate legit password, use letter 'g' in the password field.");
 	cout << "------------------------------------------------------------------------------------------------------------" << endl;
-	cout << "Do you have an account? y/n: ";
-	char yn;
-	while (cin >> yn)
-	{
-		yn = tolower(yn);
-		if (yn == 'y')
-		{
-			return true;
-		}
-		else if (yn == 'n') {
-
-			return false;
-		}
-		else {
-			cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-			cout << "Try only y(yes) or n(no): ";
-		}
-	}
+	
 }
 void inputFields(string& nick, string& pass, bool isAcc) {
 	if (!isAcc) // Если нет аккаунта то вводим легальные значения
 	{
-		cout << "Enter your nickname: ";
+		cout << "\nEnter your nickname: ";
 		getline(cin >> ws, nick);
 		while (accounts.count(nick))
 		{
-			cout << "This name is occupied. " << endl;
+			cout << "\aThis name is occupied. " << endl;
 			cout << "Enter your nickname: ";
 			getline(cin >> ws, nick);
 		}
 		while (!isLegalName(nick)) {
-			cout << "The nickname does not match the requirements " << endl;
+			cout << "\aThe nickname does not match the requirements " << endl;
 			cout << "Enter your nickname: ";
 			getline(cin >> ws, nick);// ws нужен для того чтобы избавиться от пробелных символов после cin в startmenu()
 		}
@@ -51,35 +37,37 @@ void inputFields(string& nick, string& pass, bool isAcc) {
 		pass = inputPass();
 		while (!isLegalPass(pass))
 		{
-			cout << "\nThe password does not match the requirements " << endl;
+			cout << "\n\aThe password does not match the requirements " << endl;
 			cout << "Enter your password: ";
 			pass = inputPass();
 		}
 	}
 	else { // если аккаунт есть то без разницы что вводить т.к проверятется только наличие имени
-		cout << "Enter your nickname: ";
+		cout << "\nEnter your nickname: ";
 		getline(cin >> ws, nick);
 		cout << "Enter your password: ";
 		pass = inputPass();
 	}
 
 }
-void writeToFile(string nickName, string passWord, bool firstAcc) {
+void writeToFile(string nickName, string passWord, bool& isAccounts) {
 	ofstream fout;
 	fout.open("Accounts.txt", ofstream::app);
 	if (fout.is_open())
 	{
-		if (firstAcc) {
+		if (!isAccounts) {
 			fout << "-----------------------------\n" << nickName << "\n" << passWord << "\n-----------------------------" << endl;
-			firstAcc = false;
+			isAccounts = true;
 		}
 		else {
 			fout << nickName << "\n" << passWord << "\n-----------------------------" << endl;
 		}
 		cout << "\nAccount succsesfully created!" << endl;
+		accounts.insert(make_pair(nickName, passWord));
+		
 	}
 	else {
-		cerr << "Somtheing went wrong.";
+		cerr << "\aSomtheing went wrong.";
 	}
 	fout.close();
 }
@@ -92,7 +80,7 @@ bool parceFile(map<string, string>& accounts) {
 	}
 	catch (const std::exception& ex)
 	{
-		cerr << "Error of openning the file, " << ex.what();
+		cerr << "\aError of openning the file, " << ex.what();
 		exit(0);
 	}
 	string input = "";
@@ -133,10 +121,10 @@ bool parceFile(map<string, string>& accounts) {
 	//---------------------------------------------
 	if (!accounts.size())
 	{
-		return true;
+		return false;
 	}
 	else {
-		return false;
+		return true;
 	}
 }
 bool isLegalName(string nickName) {
@@ -163,7 +151,7 @@ bool isLegalName(string nickName) {
 		{
 			if (!isalnum(nickName[i]))
 			{
-				if (nickName[i] == '_' && i != 0 && i != nickName.size() - 1 && onetimes) //Проверка наличия единсвтенного _ в нике и в серединкеx
+				if (nickName[i] == '_' && i != 0 && i != nickName.size() - 1 && onetimes) // Проверка наличия единсвтенного _ в нике и в серединкеx
 				{
 					onetimes = false;
 					continue;
@@ -184,7 +172,7 @@ bool isLegalPass(string& pass) {
 	if (pass == "g")
 	{
 		pass = generatePass();
-		cout << "Your generated password: " << pass << endl;
+		cout << "\nYour generated password: " << pass << endl;
 		return true;
 	}
 	if (pass.size() < 8 || pass.size() > 20)
@@ -278,9 +266,38 @@ string decrypt(string& toDecrypt) {
 void accMenu(map<string, string>::iterator it)
 {
 	cout << "Here's what you can do with your account, to do this, press: " << endl;
-	cout << "1) Delete your account";
-	if (_getch() == 49) {
-		removeAcc(it);
+	cout << "Press 1 to delete your account" << endl;
+	cout << "Press 2 to log out"<< endl;
+	cout << "Press 3 to change name" << endl;
+	cout << "Press ESC to quit" << endl;
+	while (true)
+	{
+		char yn;
+		//-- исключает возможность нажатия спецсимволов
+		if (_kbhit())
+		{
+			std::cin.seekg(0, std::ios::end);
+			std::cin.clear();
+		}
+		//--
+		yn = _getch();
+		if (yn == '1')
+		{
+			removeAcc(it);
+			break;
+		}
+		else if (yn == '2') {
+
+			break;
+		}
+		else if (yn == '3') {
+			//changeName(it);
+			break;
+		}
+		else if (yn == VK_ESCAPE)
+		{
+			exit(0);
+		}
 	}
 }
 void removeAcc(map<string, string>::iterator index)
@@ -305,7 +322,61 @@ void overWritingToFile()
 		}
 	}
 	else {
-		cerr << "Somtheing went wrong.";
+		cerr << "\aSomtheing went wrong.";
 	}
 	fout.close();
 }
+void sleepper(string s)
+{
+	int time = 0; //20
+	for (int i = 0; i < s.length(); i++) {
+		Sleep(time);
+		cout << s[i];
+	}
+	cout << endl;
+}
+void updator()
+{
+	for (auto i = 0; i < 30; i++)
+	{
+		cout << (char)8 << " " << (char)8;
+	}
+}
+bool whatToDo()
+{
+	cout << "Press 1 to create acoount"<< endl;
+	cout << "Press 2 to login to your account"<< endl;
+	cout << "Press ESC to quit"<< endl;
+	char yn;
+	while (true)
+	{
+		//-- исключает возможность нажатия спецсимволов
+		if (_kbhit())
+		{
+			std::cin.seekg(0, std::ios::end);
+			std::cin.clear();
+		}
+		//--
+		yn=_getch();
+		if (yn == '1')
+		{
+			return false;
+		}
+		else if (yn == '2') {
+
+			return true;
+		}
+		else if (yn==VK_ESCAPE)
+		{
+			exit(0);
+		} 
+	}
+}
+
+//void changeName(map<string, string>::iterator index)
+//{
+//	*index->
+//}
+
+
+
