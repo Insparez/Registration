@@ -12,7 +12,7 @@ int main()
 	ofstream fout;
 	fout.open("Accounts.txt", ofstream::app);
 	fout.close();
-	bool isAccounts = parceFile(accounts);
+	parceFile(accounts);
 	//start 
 	while (true)
 	{
@@ -22,7 +22,7 @@ int main()
 		bool isWrong = true;
 		while (isWrong)
 		{
-			if (!isAccounts)
+			if (accounts.size()==0)
 			{
 				cerr << "\aNo accounts in database!";
 				break;
@@ -38,7 +38,8 @@ int main()
 				
 			}
 			else {
-				cout << "\n\aWrong name or password!";
+				system("cls");
+				cout << "\aWrong name or password!"<< endl;
 			}
 		}
 	}
@@ -51,7 +52,7 @@ int main()
 			cout << "\aSorry name is occupied." << endl;
 			inputFields(nickName, passWord);
 		}
-		writeToFile(nickName, encrypt(passWord), isAccounts);
+		writeToFile(nickName, encrypt(passWord));
 	}
 
 	}

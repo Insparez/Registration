@@ -20,7 +20,7 @@ using namespace std;
 extern map<string, string> accounts; // использование глобального бинарного дерева
 void showRules(); // показать правила создания логина и пароля
 void inputFields(string&, string&, bool isAcc = false); // поля для ввода данных
-void writeToFile(string, string, bool& firstAcc); // запись полей в файл
+void writeToFile(string, string); // запись полей в файл
 bool parceFile(map<string, string>& accounts); // парсинг файла в бинарное дерево
 bool isLegalName(string);// проверка легитности никнейма
 string inputPass();// Пароль со звездочками
@@ -34,6 +34,6 @@ void overWritingToFile();// Перезапись аккаунтов с учетом поврежденных данных ил
 void sleepper(string);//Плавно выводит информацию
 void updator();// обновляет строку, а не всю консоль
 bool whatToDo();// сздать аккаунт , залогиниться или выйти из приложения
-//void changeName(map<string, string>::iterator index); // изменение имени
+void changeName(map<string, string>::iterator index); // изменение имени
 bool myGetline(string&);// ОГРАНИЧИВАЕТ GETLINE буквы англ алфавита и цифры.
 void inputName(string&);// тупо для сокращения кода

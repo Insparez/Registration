@@ -30,7 +30,7 @@ void inputFields(string& nick, string& pass, bool isAcc) {
 		}
 		while (!isLegalName(nick)) {
 			system("cls");
-			cout << "\aThe nickname does not match the requirements " << endl;
+			cout << "\aThe nickname does not match the requirements\n" << endl;
 			cout << "Enter your nickname: ";
 			inputName(nick);
 		}
@@ -39,7 +39,7 @@ void inputFields(string& nick, string& pass, bool isAcc) {
 		while (!isLegalPass(pass))
 		{
 			system("cls");
-			cout << "\aThe password does not match the requirements " << endl;
+			cout << "\aThe password does not match the requirements\n" << endl;
 			cout << "Enter your password: ";
 			pass = inputPass();
 		}
@@ -52,14 +52,13 @@ void inputFields(string& nick, string& pass, bool isAcc) {
 	}
 
 }
-void writeToFile(string nickName, string passWord, bool& isAccounts) {
+void writeToFile(string nickName, string passWord) {
 	ofstream fout;
 	fout.open("Accounts.txt", ofstream::app);
 	if (fout.is_open())
 	{
-		if (!isAccounts) {
+		if (accounts.size()==0) {
 			fout << "-----------------------------\n" << nickName << "\n" << passWord << "\n-----------------------------" << endl;
-			isAccounts = true;
 		}
 		else {
 			fout << nickName << "\n" << passWord << "\n-----------------------------" << endl;
@@ -293,8 +292,9 @@ void accMenu(map<string, string>::iterator it)
 			break;
 		}
 		else if (yn == '3') {
-			//changeName(it);
+			changeName(it);
 			system("cls");
+			cout << "Name changed successfully.";
 			break;
 		}
 		else if (yn == VK_ESCAPE)
@@ -419,10 +419,30 @@ void inputName(string& nick)
 	}
 }
 
-//void changeName(map<string, string>::iterator index)
-//{
-//	*index->
-//}
+void changeName(map<string, string>::iterator index)
+{
+	string newName, tempPass;
+	do
+	{
+		system("cls");
+	cout << "\nEnter your new nickname: ";
+	inputName(newName);
+	} while (accounts.count(newName) || !isLegalName(newName));
+	tempPass = index->second;
+	accounts.erase(index);
+	overWritingToFile();
+	ofstream fout;
+	fout.open("Accounts.txt", ofstream::app);
+	if (accounts.size()>0)
+	{
+		fout << newName << "\n" << tempPass << "\n-----------------------------" << endl;
+	}
+	else {
+		fout << "-----------------------------\n" << newName << "\n" << tempPass << "\n-----------------------------" << endl;
+	}
+	accounts.insert(make_pair(newName, tempPass));
+		fout.close();
+}
 
 
 
