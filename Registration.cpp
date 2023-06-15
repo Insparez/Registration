@@ -4,10 +4,9 @@
 
 map<string, string> accounts;
 
-
 int main()
 {
-	//system("color F0");
+	system("color F0");
 	srand(time(0));
 	string nickName, passWord;
 	ofstream fout;
@@ -25,17 +24,18 @@ int main()
 		{
 			if (!isAccounts)
 			{
-				cerr << "\aNo accounts in database!" << endl;
+				cerr << "\aNo accounts in database!";
 				break;
 			}
 			inputFields(nickName, passWord, true);
 			auto it = accounts.find(nickName);
 			if (it != accounts.end() && passWord == decrypt(it->second))
 			{
-				cout << "\nSuccsesfully login in account!\n" << endl;
+				system("cls");
+				cout << "Succsesfully login in account!";
 				isWrong = false;
 				accMenu(it);
-				system("cls");
+				
 			}
 			else {
 				cout << "\n\aWrong name or password!";

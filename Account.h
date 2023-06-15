@@ -35,3 +35,5 @@ void sleepper(string);//Плавно выводит информацию
 void updator();// обновляет строку, а не всю консоль
 bool whatToDo();// сздать аккаунт , залогиниться или выйти из приложения
 //void changeName(map<string, string>::iterator index); // изменение имени
+bool myGetline(string&);// ОГРАНИЧИВАЕТ GETLINE буквы англ алфавита и цифры.
+void inputName(string&);// тупо для сокращения кода

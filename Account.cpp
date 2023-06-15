@@ -21,30 +21,32 @@ void inputFields(string& nick, string& pass, bool isAcc) {
 	if (!isAcc) // Если нет аккаунта то вводим легальные значения
 	{
 		cout << "\nEnter your nickname: ";
-		getline(cin >> ws, nick);
+		inputName(nick);
 		while (accounts.count(nick))
 		{
 			cout << "\aThis name is occupied. " << endl;
 			cout << "Enter your nickname: ";
-			getline(cin >> ws, nick);
+			inputName(nick);
 		}
 		while (!isLegalName(nick)) {
+			system("cls");
 			cout << "\aThe nickname does not match the requirements " << endl;
 			cout << "Enter your nickname: ";
-			getline(cin >> ws, nick);// ws нужен для того чтобы избавиться от пробелных символов после cin в startmenu()
+			inputName(nick);
 		}
 		cout << "Enter your password: ";
 		pass = inputPass();
 		while (!isLegalPass(pass))
 		{
-			cout << "\n\aThe password does not match the requirements " << endl;
+			system("cls");
+			cout << "\aThe password does not match the requirements " << endl;
 			cout << "Enter your password: ";
 			pass = inputPass();
 		}
 	}
 	else { // если аккаунт есть то без разницы что вводить т.к проверятется только наличие имени
 		cout << "\nEnter your nickname: ";
-		getline(cin >> ws, nick);
+		inputName(nick);
 		cout << "Enter your password: ";
 		pass = inputPass();
 	}
@@ -62,7 +64,8 @@ void writeToFile(string nickName, string passWord, bool& isAccounts) {
 		else {
 			fout << nickName << "\n" << passWord << "\n-----------------------------" << endl;
 		}
-		cout << "\nAccount succsesfully created!" << endl;
+		system("cls");
+		cout << "Account succsesfully created!";
 		accounts.insert(make_pair(nickName, passWord));
 		
 	}
@@ -265,8 +268,7 @@ string decrypt(string& toDecrypt) {
 }
 void accMenu(map<string, string>::iterator it)
 {
-	cout << "Here's what you can do with your account, to do this, press: " << endl;
-	cout << "Press 1 to delete your account" << endl;
+	cout << "\n\nPress 1 to delete your account" << endl;
 	cout << "Press 2 to log out"<< endl;
 	cout << "Press 3 to change name" << endl;
 	cout << "Press ESC to quit" << endl;
@@ -287,11 +289,12 @@ void accMenu(map<string, string>::iterator it)
 			break;
 		}
 		else if (yn == '2') {
-
+			system("cls");
 			break;
 		}
 		else if (yn == '3') {
 			//changeName(it);
+			system("cls");
 			break;
 		}
 		else if (yn == VK_ESCAPE)
@@ -304,7 +307,8 @@ void removeAcc(map<string, string>::iterator index)
 {
 	accounts.erase(index);
 	overWritingToFile();
-	cout << "\nAcoount deleted!." << endl;
+	system("cls");
+	cout << "Account deleted!";
 }
 void overWritingToFile()
 {
@@ -344,7 +348,7 @@ void updator()
 }
 bool whatToDo()
 {
-	cout << "Press 1 to create acoount"<< endl;
+	cout << "\n\nPress 1 to create acoount"<< endl;
 	cout << "Press 2 to login to your account"<< endl;
 	cout << "Press ESC to quit"<< endl;
 	char yn;
@@ -370,6 +374,48 @@ bool whatToDo()
 		{
 			exit(0);
 		} 
+	}
+}
+bool myGetline(string& nick)
+{
+	getline(cin >> ws, nick);
+	for (auto i = 0; i < nick.size(); i++)
+	{
+	if ((nick[i] >= 65 && nick[i] <= 90))
+	{
+		continue;
+	}
+	else if ((nick[i] >= 48 && nick[i] <= 57))
+	{
+		continue;
+	}
+	else if ((nick[i] >= 97 && nick[i] <= 122))
+	{
+		continue;
+	}
+	else if (nick[i] == 95)
+	{
+		continue;
+	}
+	else {
+		return false;
+	}
+	}
+	return true;
+}
+void inputName(string& nick)
+{
+	while (true)
+	{
+		if (!myGetline(nick))
+		{
+			system("cls");
+			cout << "No cyrillic alphabet!";
+			cout << "\nEnter your nickname: ";
+		}
+		else {
+			break;
+		}
 	}
 }
 
