@@ -270,6 +270,7 @@ void accMenu(map<string, string>::iterator it)
 	cout << "\n\nPress 1 to delete your account" << endl;
 	cout << "Press 2 to log out"<< endl;
 	cout << "Press 3 to change name" << endl;
+	cout << "Press 4 to change pass" << endl;
 	cout << "Press ESC to quit" << endl;
 	while (true)
 	{
@@ -295,6 +296,12 @@ void accMenu(map<string, string>::iterator it)
 			changeName(it);
 			system("cls");
 			cout << "Name changed successfully.";
+			break;
+		}
+		else if (yn == '4') {
+			changePass(it);
+			system("cls");
+			cout << "Pass changed successfully.";
 			break;
 		}
 		else if (yn == VK_ESCAPE)
@@ -332,19 +339,12 @@ void overWritingToFile()
 }
 void sleepper(string s)
 {
-	int time = 0; //20
+	int time = 20; //20
 	for (int i = 0; i < s.length(); i++) {
 		Sleep(time);
 		cout << s[i];
 	}
 	cout << endl;
-}
-void updator()
-{
-	for (auto i = 0; i < 30; i++)
-	{
-		cout << (char)8 << " " << (char)8;
-	}
 }
 bool whatToDo()
 {
@@ -418,7 +418,6 @@ void inputName(string& nick)
 		}
 	}
 }
-
 void changeName(map<string, string>::iterator index)
 {
 	string newName, tempPass;
@@ -443,6 +442,16 @@ void changeName(map<string, string>::iterator index)
 	accounts.insert(make_pair(newName, tempPass));
 		fout.close();
 }
-
-
-
+void changePass(map<string, string>::iterator index)
+{
+	string pass = "";
+	do
+	{
+		system("cls");
+		cout << "\nEnter your new password: ";
+		pass= inputPass();
+	} while (!isLegalPass(pass));
+	pass=encrypt(pass);
+	index->second = pass;
+	overWritingToFile();
+}
